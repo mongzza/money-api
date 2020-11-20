@@ -1,14 +1,14 @@
 package kakaopay.pretask.moneyapi.domain.event;
 
+import kakaopay.pretask.moneyapi.domain.event.distributing.Distributing;
+import kakaopay.pretask.moneyapi.domain.event.distributing.strategy.RandomStrategy;
 import kakaopay.pretask.moneyapi.domain.room.Room;
 import kakaopay.pretask.moneyapi.domain.user.User;
 import kakaopay.pretask.moneyapi.utils.TokenUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -74,23 +74,11 @@ public class MoneyEvent implements Serializable {
 	}
 
 	public List<SubMoneyEvent> distributeMoney(int headCount) {
-		// TODO 가능하면 분배 방식 전략 패턴 사용하도록 변경??
-		// TODO 금액 분배 분리
-		Long money = this.money;
-		long[] distributedMoneyArray = new long[headCount];
-		int floor = (int) Math.pow(10, Math.log10(money));
-		while (money != 0) {
-			int subMoney = (int)(money / floor);
-			distributedMoneyArray[(int)(Math.random() * headCount)] += subMoney;
-			money -= subMoney;
-			if (money < floor) {
-				floor = (int) Math.pow(10, Math.log10(money));
-			}
-		}
-		///////////////////////
-
 		List<SubMoneyEvent> subEvents = new ArrayList<>();
-		for (long distributedMoney : distributedMoneyArray) {
+
+		Distributing spreadMoney = new Distributing();
+		spreadMoney.setStrategy(new RandomStrategy());
+		for (long distributedMoney : spreadMoney.distribute(headCount, this.money)) {
 			subEvents.add(SubMoneyEvent.builder()
 					.event(this)
 					.money(distributedMoney)

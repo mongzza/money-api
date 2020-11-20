@@ -84,7 +84,8 @@ public class MoneyService {
 			throw new MoneyException(MoneyErrorCode.AlreadyReceivedUser);
 		}
 
-		SubMoneyEvent subEvent = subMoneyEventRepository.findFirstByAssignedYnAndEvent_Token('N', token);
+		SubMoneyEvent subEvent = subMoneyEventRepository.findFirstByAssignedYnAndEvent_Token('N', token)
+				.orElseThrow(() -> new MoneyException(MoneyErrorCode.AlreadyAllReceived));
 		subEvent.update(user);
 		return subEvent.getMoney();
 	}
