@@ -1,0 +1,64 @@
+### 뿌리기 API 성공 케이스
+POST http://localhost:8080/money/spread
+Content-Type: application/json
+X-USER-ID: 10001
+X-ROOM-ID: ROOM1
+
+{
+  "money": 50000,
+  "headCount": 2
+}
+
+### 뿌리기 API 실패 케이스 - 유저 정보
+POST http://localhost:8080/money/spread
+Content-Type: application/json
+X-USER-ID: 11111
+X-ROOM-ID: ROOM1
+
+{
+  "money": 50000,
+  "headCount": 6
+}
+
+### 뿌리기 API 실패 케이스 - 방 정보
+POST http://localhost:8080/money/spread
+Content-Type: application/json
+X-USER-ID: 10001
+X-ROOM-ID: ROOM13
+
+{
+  "money": 50000,
+  "headCount": 6
+}
+
+
+### 받기 API 성공 케이스
+PUT http://localhost:8080/money/spread/aaa
+Content-Type: application/json
+X-USER-ID: 10003
+X-ROOM-ID: ROOM1
+
+### 받기 API 실패 케이스 - 이미 받은 사용자가 다시 요청
+PUT http://localhost:8080/money/spread/aaa
+Content-Type: application/json
+X-USER-ID: 10003
+X-ROOM-ID: ROOM1
+
+### 받기 API 실패 케이스 - 뿌린 사용자가 요청
+PUT http://localhost:8080/money/spread/aaa
+Content-Type: application/json
+X-USER-ID: 10001
+X-ROOM-ID: ROOM1
+
+### 받기 API 실패 케이스 - 대화방에 없는 사용자
+PUT http://localhost:8080/money/spread/aaa
+Content-Type: application/json
+X-USER-ID: 10008
+X-ROOM-ID: ROOM1
+
+### 받기 API 실패 케이스 - 발급되지 않은 토큰
+PUT http://localhost:8080/money/spread/www
+Content-Type: application/json
+X-USER-ID: 10003
+X-ROOM-ID: ROOM1
+
