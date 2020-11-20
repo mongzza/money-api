@@ -77,7 +77,7 @@ public class MoneyService {
 				.getUser();
 
 		MoneyEvent event = moneyEventRepository.findByTokenAndRoomIsAndRecvExpDateAfter(token, room, LocalDateTime.now())
-				.orElseThrow(() -> new MoneyException(MoneyErrorCode.ExpireReceiveDate));
+				.orElseThrow(() -> new MoneyException(MoneyErrorCode.ExpireReceiveDateOrNotAuthUser));
 
 		long userCount = subMoneyEventRepository.countSubMoneyEventByUser_UserIdOrEvent_User_UserId(userId, userId);
 		if (userCount > 0) {

@@ -4,7 +4,7 @@ import kakaopay.pretask.moneyapi.domain.event.distributing.Distributing;
 import kakaopay.pretask.moneyapi.domain.event.distributing.strategy.RandomStrategy;
 import kakaopay.pretask.moneyapi.domain.room.Room;
 import kakaopay.pretask.moneyapi.domain.user.User;
-import kakaopay.pretask.moneyapi.utils.TokenUtils;
+import kakaopay.pretask.moneyapi.utils.token.TokenUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -63,7 +63,7 @@ public class MoneyEvent implements Serializable {
 
 	@Builder
 	public MoneyEvent(User user, Room room, Long money) {
-		this.token = TokenUtils.randomToken();
+		this.token = TokenUtils.create();
 		this.user = user;
 		this.room = room;
 		this.money = money;

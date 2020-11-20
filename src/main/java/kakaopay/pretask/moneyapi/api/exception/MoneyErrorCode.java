@@ -11,7 +11,7 @@ public enum MoneyErrorCode {
 	AlreadyReceivedUser(4003, "뿌리기를 했거나 이미 받기 완료된 사용자입니다."),
 	AlreadyAllReceived(4004, "받기 가능 제한 인원이 초과되었습니다."),
 
-	ExpireReceiveDate(4005, "요청하신 뿌리기 건의 받기 기한이 만료되었습니다."),
+	ExpireReceiveDateOrNotAuthUser(4005, "요청하신 뿌리기 건의 받기 기한이 만료되었거나 받기 권한이 없는 사용자입니다."),
 	ExpireViewDateOrNotAuthUser(4006, "요청하신 뿌리기 건의 조회 기한이 만료되었거나 조회 권한이 없는 사용자입니다.")
 	;
 

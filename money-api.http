@@ -91,4 +91,3 @@ GET http://localhost:8080/money/spread/www
 Content-Type: application/json
 X-USER-ID: 10001
 X-ROOM-ID: ROOM1
-
