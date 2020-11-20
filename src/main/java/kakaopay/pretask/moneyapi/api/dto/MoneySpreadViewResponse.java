@@ -8,6 +8,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -17,14 +18,16 @@ public class MoneySpreadViewResponse {
 	private Long receivedMoney;
 	private List<ReceivedInfoResponse> receivedInfo;
 
-	public MoneySpreadViewResponse(MoneyEvent event) {
+	public MoneySpreadViewResponse(MoneyEvent event, Long receivedMoney) {
 		this.createdDate = event.getCreatedDate();
 		this.money = event.getMoney();
+		this.receivedMoney = receivedMoney;
 		this.receivedInfo = new ArrayList<>();
-		for (int i = 0; i < event.getSubEvents().size(); i++) {
-			new ReceivedInfoResponse(event.getSubEvents().get(i));
-		}
+		event.getSubEvents().stream()
+				.filter(subEvent -> subEvent.getAssignedYn() == 'Y')
+				.forEach(subEvent -> this.receivedInfo.add(new ReceivedInfoResponse(subEvent)));
 	}
+
 }
 
 @Getter

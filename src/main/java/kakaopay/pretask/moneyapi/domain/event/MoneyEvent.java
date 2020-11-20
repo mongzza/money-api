@@ -6,6 +6,7 @@ import kakaopay.pretask.moneyapi.utils.TokenUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.annotation.CreatedDate;
@@ -74,7 +75,6 @@ public class MoneyEvent implements Serializable {
 
 	public List<SubMoneyEvent> distributeMoney(int headCount) {
 		// TODO 가능하면 분배 방식 전략 패턴 사용하도록 변경??
-
 		// TODO 금액 분배 분리
 		Long money = this.money;
 		long[] distributedMoneyArray = new long[headCount];
@@ -97,6 +97,10 @@ public class MoneyEvent implements Serializable {
 					.build());
 		}
 		return subEvents;
+	}
+
+	public void updateAllRecvY() {
+		this.allRecvYn = 'Y';
 	}
 
 }

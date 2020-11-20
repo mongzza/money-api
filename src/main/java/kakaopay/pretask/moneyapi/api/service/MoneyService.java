@@ -1,6 +1,7 @@
 package kakaopay.pretask.moneyapi.api.service;
 
 import kakaopay.pretask.moneyapi.api.dto.MoneySpreadRequest;
+import kakaopay.pretask.moneyapi.api.dto.MoneySpreadViewResponse;
 import kakaopay.pretask.moneyapi.api.exception.MoneyErrorCode;
 import kakaopay.pretask.moneyapi.api.exception.MoneyException;
 import kakaopay.pretask.moneyapi.domain.UsersInRoomRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -96,10 +98,21 @@ public class MoneyService {
 	 * @return 조회한 뿌리기 건 정보
 	 */
 	@Transactional
-	public MoneyEvent viewInfo(Long userId, String roomId, String token) {
+	public MoneySpreadViewResponse viewInfo(Long userId, String roomId, String token) {
 		Room room = roomRepository.findByRoomId(roomId)
 				.orElseThrow(() -> new MoneyException(MoneyErrorCode.MisMatchRoomId));
-		return moneyEventRepository.findByTokenAndUser_UserIdAndViewExpDateAfter(token, userId, LocalDateTime.now())
+		MoneyEvent event = moneyEventRepository.findByTokenAndUser_UserIdAndViewExpDateAfter(token, userId, LocalDateTime.now())
 				.orElseThrow(() -> new MoneyException(MoneyErrorCode.ExpireViewDateOrNotAuthUser));
+
+		List<SubMoneyEvent> subEvents = subMoneyEventRepository.findAllByAssignedYnAndEvent_Token('Y', token);
+		long receivedMoney = subEvents.stream()
+				.mapToLong(SubMoneyEvent::getMoney)
+				.sum();
+
+		if (receivedMoney == event.getMoney()) {
+			event.updateAllRecvY();
+		}
+
+		return new MoneySpreadViewResponse(event, receivedMoney);
 	}
 }

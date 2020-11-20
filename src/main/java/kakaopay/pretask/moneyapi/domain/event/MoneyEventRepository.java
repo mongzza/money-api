@@ -11,4 +11,5 @@ public interface MoneyEventRepository extends CrudRepository<MoneyEvent, Long> {
 	Optional<MoneyEvent> findByTokenAndRoomIsAndRecvExpDateAfter(String token, Room room, LocalDateTime now);
 
 	Optional<MoneyEvent> findByTokenAndUser_UserIdAndViewExpDateAfter(String token, Long userId, LocalDateTime now);
+
 }

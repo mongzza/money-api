@@ -32,10 +32,16 @@ X-ROOM-ID: ROOM13
 }
 
 
-### 받기 API 성공 케이스
+### 받기 API 성공 케이스 - 사용자1
 PUT http://localhost:8080/money/spread/aaa
 Content-Type: application/json
 X-USER-ID: 10003
+X-ROOM-ID: ROOM1
+
+### 받기 API 성공 케이스 - 사용자2
+PUT http://localhost:8080/money/spread/aaa
+Content-Type: application/json
+X-USER-ID: 10004
 X-ROOM-ID: ROOM1
 
 ### 받기 API 실패 케이스 - 이미 받은 사용자가 다시 요청
@@ -60,5 +66,29 @@ X-ROOM-ID: ROOM1
 PUT http://localhost:8080/money/spread/www
 Content-Type: application/json
 X-USER-ID: 10003
+X-ROOM-ID: ROOM1
+
+### 조회 API 성공 케이스
+GET http://localhost:8080/money/spread/aaa
+Content-Type: application/json
+X-USER-ID: 10001
+X-ROOM-ID: ROOM1
+
+### 조회 API 실패 케이스 - 뿌리기 하지 않은 사용자가 요청
+GET http://localhost:8080/money/spread/aaa
+Content-Type: application/json
+X-USER-ID: 10003
+X-ROOM-ID: ROOM1
+
+### 조회 API 실패 케이스 - 대화방에 없는 사용자가 요청
+GET http://localhost:8080/money/spread/aaa
+Content-Type: application/json
+X-USER-ID: 10008
+X-ROOM-ID: ROOM1
+
+### 조회 API 실패 케이스 - 발급되지 않은 토큰 요청
+GET http://localhost:8080/money/spread/www
+Content-Type: application/json
+X-USER-ID: 10001
 X-ROOM-ID: ROOM1
 

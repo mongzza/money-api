@@ -60,7 +60,7 @@ public class MoneyController {
 		long userId = Long.parseLong(Objects.requireNonNull(headers.getFirst(USER_ID_HEADER)));
 		String roomId = headers.getFirst(ROOM_ID_HEADER);
 
-		return new MoneySpreadViewResponse(moneyService.viewInfo(userId, roomId, token));
+		return moneyService.viewInfo(userId, roomId, token);
 	}
 
 }
