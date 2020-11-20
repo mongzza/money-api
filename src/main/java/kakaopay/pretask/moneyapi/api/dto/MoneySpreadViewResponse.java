@@ -11,13 +11,11 @@ import java.util.List;
 
 @Getter
 @Setter
-public class MoneySpreadViewResponse extends CommonResponse {
+public class MoneySpreadViewResponse {
 	private LocalDateTime createdDate;
 	private Long money;
 	private Long receivedMoney;
 	private List<ReceivedInfoResponse> receivedInfo;
-
-	public MoneySpreadViewResponse() {}
 
 	public MoneySpreadViewResponse(MoneyEvent event) {
 		this.createdDate = event.getCreatedDate();

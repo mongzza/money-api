@@ -5,6 +5,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MoneyRecvResponse extends CommonResponse {
-	private Long money;
+public class MoneyRecvResponse {
+	private long money;
+
+	public MoneyRecvResponse(long money) {
+		this.money = money;
+	}
 }

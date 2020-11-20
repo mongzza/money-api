@@ -5,6 +5,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MoneySpreadResponse extends CommonResponse {
+public class MoneySpreadResponse {
 	private String token;
+
+	public MoneySpreadResponse(String token) {
+		this.token = token;
+	}
 }
