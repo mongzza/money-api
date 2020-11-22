@@ -25,7 +25,7 @@ public class ReceivedMoney implements Serializable {
 	private SpreadMoney event;
 
 	@ManyToOne
-	@JoinColumn(name = "USER_ID")
+	@JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID", nullable = false)
 	private User user;
 
 	@Column(nullable = false)

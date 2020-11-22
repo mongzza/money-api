@@ -18,9 +18,6 @@ public class MoneyController {
 
 	private final MoneyService moneyService;
 
-	// TODO headers 어케 처리할지, 중복 코드
-	// TODO token을 url에 노출해도 되는지 확인 필요
-
 	/**
 	 * 뿌리기 API
 	 * @param headers : 요청 헤더

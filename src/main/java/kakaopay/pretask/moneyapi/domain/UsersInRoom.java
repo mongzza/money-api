@@ -20,10 +20,10 @@ public class UsersInRoom implements Serializable {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "USER_ID")
+	@JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID", nullable = false)
 	private User user;
 
 	@ManyToOne
-	@JoinColumn(name = "ROOM_ID", referencedColumnName = "ROOM_ID")
+	@JoinColumn(name = "ROOM_ID", referencedColumnName = "ROOM_ID", nullable = false)
 	private Room room;
 }

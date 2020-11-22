@@ -5,9 +5,9 @@ import kakaopay.pretask.moneyapi.domain.event.distributing.strategy.DistributeSt
 import java.math.BigDecimal;
 
 public class Distributing {
-	private DistributeStrategy strategy;
+	private final DistributeStrategy strategy;
 
-	public void setStrategy(DistributeStrategy strategy) {
+	public Distributing(DistributeStrategy strategy) {
 		this.strategy = strategy;
 	}
 

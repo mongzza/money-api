@@ -5,7 +5,7 @@ import kakaopay.pretask.moneyapi.utils.token.creating.strategy.CreateStrategy;
 public class Creating {
 	private CreateStrategy strategy;
 
-	public void setStrategy(CreateStrategy strategy) {
+	public Creating(CreateStrategy strategy) {
 		this.strategy = strategy;
 	}
 

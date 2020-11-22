@@ -29,11 +29,11 @@ public class SpreadMoney implements Serializable {
 	private String token;
 
 	@ManyToOne
-	@JoinColumn(name = "USER_ID")
+	@JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID", nullable = false)
 	private User user;
 
 	@ManyToOne
-	@JoinColumn(name = "ROOM_ID", referencedColumnName = "ROOM_ID")
+	@JoinColumn(name = "ROOM_ID", referencedColumnName = "ROOM_ID", nullable = false)
 	private Room room;
 
 	@Column(nullable = false)
@@ -42,7 +42,6 @@ public class SpreadMoney implements Serializable {
 	@Column(nullable = false)
 	private Long headCount;
 
-	//@CreatedDate
 	@Column(nullable = false)
 	private LocalDateTime createdDate;
 

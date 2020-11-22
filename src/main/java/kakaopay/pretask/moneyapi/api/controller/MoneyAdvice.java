@@ -19,7 +19,7 @@ public class MoneyAdvice {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> otherExceptionHandler(Exception e) {
 		e.printStackTrace();
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

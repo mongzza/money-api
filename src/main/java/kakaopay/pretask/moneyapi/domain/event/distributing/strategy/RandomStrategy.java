@@ -9,8 +9,8 @@ public class RandomStrategy implements DistributeStrategy{
 		if (remainedHeadCount == 1) {
 			return remainedMoney;
 		}
-
-		return remainedMoney.divideToIntegralValue(new BigDecimal(remainedHeadCount));
+		BigDecimal operand = remainedMoney.divideToIntegralValue(BigDecimal.valueOf(Math.random() * remainedHeadCount + 1));
+		return remainedMoney.subtract(operand);
 	}
 
 }

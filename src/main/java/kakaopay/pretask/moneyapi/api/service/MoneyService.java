@@ -143,9 +143,8 @@ public class MoneyService {
 	}
 
 	private BigDecimal distributeMoney(Long headCount, BigDecimal money) {
-		Distributing method = new Distributing();
-		method.setStrategy(new SameStrategy());
-		return method.distribute(headCount, money);
+		return new Distributing(new SameStrategy())
+				.distribute(headCount, money);
 	}
 
 }
