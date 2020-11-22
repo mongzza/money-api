@@ -9,7 +9,5 @@ public interface SpreadMoneyRepository extends CrudRepository<SpreadMoney, Long>
 
 	Optional<SpreadMoney> findByTokenAndRecvExpDateAfter(String token, LocalDateTime now);
 
-	boolean existsByTokenAndUser_UserId(String token, Long userId);
-
 	Optional<SpreadMoney> findByTokenAndViewExpDateAfter(String token, LocalDateTime now);
 }
