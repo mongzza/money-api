@@ -55,8 +55,8 @@ public class SpreadMoney implements Serializable {
 	private List<ReceivedMoney> receivedMonies = new ArrayList<>();
 
 	@Builder
-	public SpreadMoney(User user, Room room, BigDecimal money, Long headCount) {
-		this.token = TokenUtils.create();
+	public SpreadMoney(String token, User user, Room room, BigDecimal money, Long headCount) {
+		this.token = token;
 		this.user = user;
 		this.room = room;
 		this.money = money;

@@ -13,6 +13,7 @@ import kakaopay.pretask.moneyapi.domain.room.Room;
 import kakaopay.pretask.moneyapi.domain.room.RoomRepository;
 import kakaopay.pretask.moneyapi.domain.user.User;
 import kakaopay.pretask.moneyapi.domain.user.UserRepository;
+import kakaopay.pretask.moneyapi.utils.token.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +46,7 @@ public class MoneyService {
 		validatePossibleHeadCount(usersInRoom.getRoom(), request.getHeadCount());
 
 		SpreadMoney event = SpreadMoney.builder()
+				.token(TokenUtils.create())
 				.user(usersInRoom.getUser())
 				.room(usersInRoom.getRoom())
 				.money(request.getMoney())
