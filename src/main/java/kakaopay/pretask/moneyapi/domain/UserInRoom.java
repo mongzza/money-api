@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Getter
 @NoArgsConstructor
 @Entity
-public class UsersInRoom implements Serializable {
+public class UserInRoom implements Serializable {
 
 	private static final long serialVersionUID = 5980778954633384969L;
 

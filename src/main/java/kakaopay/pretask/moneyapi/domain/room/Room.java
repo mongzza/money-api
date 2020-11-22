@@ -1,6 +1,6 @@
 package kakaopay.pretask.moneyapi.domain.room;
 
-import kakaopay.pretask.moneyapi.domain.UsersInRoom;
+import kakaopay.pretask.moneyapi.domain.UserInRoom;
 import kakaopay.pretask.moneyapi.domain.event.SpreadMoney;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,7 +26,7 @@ public class Room implements Serializable {
 	private String roomId;
 
 	@OneToMany(mappedBy = "room")
-	private List<UsersInRoom> users = new ArrayList<>();
+	private List<UserInRoom> users = new ArrayList<>();
 
 	@OneToMany(mappedBy = "room")
 	private List<SpreadMoney> events = new ArrayList<>();

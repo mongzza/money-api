@@ -1,6 +1,6 @@
 package kakaopay.pretask.moneyapi.domain.user;
 
-import kakaopay.pretask.moneyapi.domain.UsersInRoom;
+import kakaopay.pretask.moneyapi.domain.UserInRoom;
 import kakaopay.pretask.moneyapi.domain.event.SpreadMoney;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +22,7 @@ public class User implements Serializable {
 	private Long userId;
 
 	@OneToMany(mappedBy = "user")
-	private List<UsersInRoom> rooms = new ArrayList<>();
+	private List<UserInRoom> rooms = new ArrayList<>();
 
 	@OneToMany(mappedBy = "user")
 	private List<SpreadMoney> events = new ArrayList<>();

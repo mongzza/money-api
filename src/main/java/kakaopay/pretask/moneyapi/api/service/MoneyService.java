@@ -4,8 +4,8 @@ import kakaopay.pretask.moneyapi.api.dto.MoneySpreadRequest;
 import kakaopay.pretask.moneyapi.api.dto.MoneySpreadViewResponse;
 import kakaopay.pretask.moneyapi.api.exception.MoneyErrorCode;
 import kakaopay.pretask.moneyapi.api.exception.MoneyException;
-import kakaopay.pretask.moneyapi.domain.UsersInRoom;
-import kakaopay.pretask.moneyapi.domain.UsersInRoomRepository;
+import kakaopay.pretask.moneyapi.domain.UserInRoom;
+import kakaopay.pretask.moneyapi.domain.UserInRoomRepository;
 import kakaopay.pretask.moneyapi.domain.event.*;
 import kakaopay.pretask.moneyapi.domain.event.distributing.Distributing;
 import kakaopay.pretask.moneyapi.domain.event.distributing.strategy.SameStrategy;
@@ -32,7 +32,7 @@ public class MoneyService {
 
 	private final UserRepository userRepository;
 	private final RoomRepository roomRepository;
-	private final UsersInRoomRepository usersInRoomRepository;
+	private final UserInRoomRepository userInRoomRepository;
 
 	private final SpreadMoneyRepository spreadMoneyRepository;
 	private final ReceivedMoneyRepository receivedMoneyRepository;
@@ -44,23 +44,10 @@ public class MoneyService {
 	 * @param request : 사용자 요청 데이터
 	 * @return token
 	 */
-	@Retryable(maxAttempts = 2, value = {DataIntegrityViolationException.class, ConstraintViolationException.class})
-	@Transactional
 	public String spread(Long userId, String roomId, MoneySpreadRequest request) {
-		UsersInRoom usersInRoom = findUserInRoom(userId, roomId);
-
-		validatePossibleHeadCount(usersInRoom.getRoom(), request.getHeadCount());
-
-		SpreadMoney event = SpreadMoney.builder()
-				.token(TokenUtils.create())
-				.user(usersInRoom.getUser())
-				.room(usersInRoom.getRoom())
-				.money(request.getMoney())
-				.headCount(request.getHeadCount())
-				.build();
-
-		spreadMoneyRepository.save(event);
-		return event.getToken();
+		UserInRoom userInRoom = findUserInRoom(userId, roomId);
+		validatePossibleHeadCount(userInRoom.getRoom(), request.getHeadCount());
+		return saveNewSpreadMoney(userInRoom, request);
 	}
 
 	/**
@@ -107,6 +94,11 @@ public class MoneyService {
 		return new MoneySpreadViewResponse(event);
 	}
 
+	/**
+	 * 해당 방에서 받기 가능한 최대 인원 수 검증
+	 * @param room : 방 정보
+	 * @param requestHeadCount : 요청한 인원 수
+	 */
 	private void validatePossibleHeadCount(Room room, long requestHeadCount) {
 		long headCountInRoom = room.getUsers().size();
 		if (requestHeadCount > headCountInRoom - 1) {
@@ -114,6 +106,11 @@ public class MoneyService {
 		}
 	}
 
+	/**
+	 * 요청자의 받기 가능 여부 검증
+	 * @param event : 요청 받은 토큰 값으로 조회한 뿌리기
+	 * @param user : 요청 사용자
+	 */
 	private void validateReceivingUser(SpreadMoney event, User user) {
 		if (event.isSpreadUser(user)) {
 			throw new MoneyException(MoneyErrorCode.SpreadUser);
@@ -126,30 +123,78 @@ public class MoneyService {
 		}
 	}
 
+	/**
+	 * 요청자의 조회 가능 여부 검증
+	 * @param event : 요청 받은 토큰 값으로 조회한 뿌리기
+	 * @param user : 요청 사용자
+	 */
 	private void validateViewingUser(SpreadMoney event, User user) {
 		if (event.isNotSpreadUser(user)) {
 			throw new MoneyException(MoneyErrorCode.NotSpreadUser);
 		}
 	}
 
+	/**
+	 * 요청 정보로 뿌리기 이벤트 생성 및 토큰 발급 (토큰 중복 시 1번 재시도)
+	 * @param userInRoom : 대화방과 사용자 정보
+	 * @param request : 요청 정보
+	 * @return 생성 토큰
+	 */
+	@Retryable(maxAttempts = 2, value = {DataIntegrityViolationException.class, ConstraintViolationException.class})
+	@Transactional
+	protected String saveNewSpreadMoney(UserInRoom userInRoom, MoneySpreadRequest request) {
+		SpreadMoney event = SpreadMoney.builder()
+				.token(TokenUtils.create())
+				.user(userInRoom.getUser())
+				.room(userInRoom.getRoom())
+				.money(request.getMoney())
+				.headCount(request.getHeadCount())
+				.build();
+
+		spreadMoneyRepository.save(event);
+		return event.getToken();
+	}
+
+	/**
+	 * 디비에 저장되어있는 방 정보 조회
+	 * @param roomId : 방 아이디
+	 * @return 방 정보
+	 */
 	@Transactional(readOnly = true)
 	protected Room findRoom(String roomId) {
 		return roomRepository.findByRoomId(roomId)
 				.orElseThrow(() -> new MoneyException(MoneyErrorCode.NotExistRoom));
 	}
 
+	/**
+	 * 디비에 저장되어있는 사용자 정보 조회
+	 * @param userId : 사용자 아이디
+	 * @return 사용자 정보
+	 */
 	@Transactional(readOnly = true)
 	protected User findUser(Long userId) {
 		return userRepository.findById(userId)
 				.orElseThrow(() -> new MoneyException(MoneyErrorCode.NotExistUser));
 	}
 
+	/**
+	 * 디비에 저장되어있는 사용자 + 속해있는 방 정보
+	 * @param userId : 사용자 아이디
+	 * @param roomId : 방 아이디
+	 * @return 사용자 정보 + 속해있는 방 정보
+	 */
 	@Transactional(readOnly = true)
-	protected UsersInRoom findUserInRoom(Long userId, String roomId) {
-		return usersInRoomRepository.findByUserAndRoom(findUser(userId), findRoom(roomId))
+	protected UserInRoom findUserInRoom(Long userId, String roomId) {
+		return userInRoomRepository.findByUserAndRoom(findUser(userId), findRoom(roomId))
 				.orElseThrow(() -> new MoneyException(MoneyErrorCode.NotExistUserInRoom));
 	}
 
+	/**
+	 * 머니 분배
+	 * @param headCount : 분배할 남은 인원 수
+	 * @param money : 분배할 남은 머니
+	 * @return 분배한 머니
+	 */
 	private BigDecimal distributeMoney(Long headCount, BigDecimal money) {
 		return new Distributing(new SameStrategy())
 				.distribute(headCount, money);

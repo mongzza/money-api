@@ -6,8 +6,8 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-public interface UsersInRoomRepository extends CrudRepository<UsersInRoom, Long> {
+public interface UserInRoomRepository extends CrudRepository<UserInRoom, Long> {
 
-	Optional<UsersInRoom> findByUserAndRoom(User user, Room room);
+	Optional<UserInRoom> findByUserAndRoom(User user, Room room);
 
 }
