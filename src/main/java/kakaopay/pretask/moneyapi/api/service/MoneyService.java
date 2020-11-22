@@ -135,19 +135,19 @@ public class MoneyService {
 	@Transactional(readOnly = true)
 	protected Room findRoom(String roomId) {
 		return roomRepository.findByRoomId(roomId)
-				.orElseThrow(() -> new MoneyException(MoneyErrorCode.MisMatchRoomId));
+				.orElseThrow(() -> new MoneyException(MoneyErrorCode.NotExistRoom));
 	}
 
 	@Transactional(readOnly = true)
 	protected User findUser(Long userId) {
 		return userRepository.findById(userId)
-				.orElseThrow(() -> new MoneyException(MoneyErrorCode.MisMatchUserId));
+				.orElseThrow(() -> new MoneyException(MoneyErrorCode.NotExistUser));
 	}
 
 	@Transactional(readOnly = true)
 	protected UsersInRoom findUserInRoom(Long userId, String roomId) {
 		return usersInRoomRepository.findByUserAndRoom(findUser(userId), findRoom(roomId))
-				.orElseThrow(() -> new MoneyException(MoneyErrorCode.MisMatchUserInRoom));
+				.orElseThrow(() -> new MoneyException(MoneyErrorCode.NotExistUserInRoom));
 	}
 
 	private BigDecimal distributeMoney(Long headCount, BigDecimal money) {
