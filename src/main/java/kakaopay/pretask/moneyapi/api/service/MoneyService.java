@@ -148,5 +148,4 @@ public class MoneyService {
 		return new Distributing(new SameStrategy())
 				.distribute(headCount, money);
 	}
-
 }
