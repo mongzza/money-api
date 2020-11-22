@@ -15,12 +15,17 @@ import kakaopay.pretask.moneyapi.domain.user.User;
 import kakaopay.pretask.moneyapi.domain.user.UserRepository;
 import kakaopay.pretask.moneyapi.utils.token.TokenUtils;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@EnableRetry
 @RequiredArgsConstructor
 @Service
 public class MoneyService {
@@ -39,6 +44,7 @@ public class MoneyService {
 	 * @param request : 사용자 요청 데이터
 	 * @return token
 	 */
+	@Retryable(maxAttempts = 2, value = {DataIntegrityViolationException.class, ConstraintViolationException.class})
 	@Transactional
 	public String spread(Long userId, String roomId, MoneySpreadRequest request) {
 		UsersInRoom usersInRoom = findUserInRoom(userId, roomId);
