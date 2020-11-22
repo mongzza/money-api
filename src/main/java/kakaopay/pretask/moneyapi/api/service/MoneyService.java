@@ -4,11 +4,11 @@ import kakaopay.pretask.moneyapi.api.dto.MoneySpreadRequest;
 import kakaopay.pretask.moneyapi.api.dto.MoneySpreadViewResponse;
 import kakaopay.pretask.moneyapi.api.exception.MoneyErrorCode;
 import kakaopay.pretask.moneyapi.api.exception.MoneyException;
+import kakaopay.pretask.moneyapi.domain.UsersInRoom;
 import kakaopay.pretask.moneyapi.domain.UsersInRoomRepository;
-import kakaopay.pretask.moneyapi.domain.event.MoneyEvent;
-import kakaopay.pretask.moneyapi.domain.event.MoneyEventRepository;
-import kakaopay.pretask.moneyapi.domain.event.SubMoneyEvent;
-import kakaopay.pretask.moneyapi.domain.event.SubMoneyEventRepository;
+import kakaopay.pretask.moneyapi.domain.event.*;
+import kakaopay.pretask.moneyapi.domain.event.distributing.Distributing;
+import kakaopay.pretask.moneyapi.domain.event.distributing.strategy.SameStrategy;
 import kakaopay.pretask.moneyapi.domain.room.Room;
 import kakaopay.pretask.moneyapi.domain.room.RoomRepository;
 import kakaopay.pretask.moneyapi.domain.user.User;
@@ -17,8 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -28,11 +28,11 @@ public class MoneyService {
 	private final RoomRepository roomRepository;
 	private final UsersInRoomRepository usersInRoomRepository;
 
-	private final MoneyEventRepository moneyEventRepository;
-	private final SubMoneyEventRepository subMoneyEventRepository;
+	private final SpreadMoneyRepository spreadMoneyRepository;
+	private final ReceivedMoneyRepository receivedMoneyRepository;
 
 	/**
-	 * 금액, 인원 받아서 총 금액을 인원 수에 맞게 분배 처리하고 토큰 발급
+	 * 금액, 인원 받아서 토큰 발급 및 뿌리기 건 생성
 	 * @param userId : 사용자 아이디
 	 * @param roomId : 대화방 아이디
 	 * @param request : 사용자 요청 데이터
@@ -40,28 +40,23 @@ public class MoneyService {
 	 */
 	@Transactional
 	public String spread(Long userId, String roomId, MoneySpreadRequest request) {
-		Room room = roomRepository.findByRoomId(roomId)
-				.orElseThrow(() -> new MoneyException(MoneyErrorCode.MisMatchRoomId));
-		User host = userRepository.findById(userId)
-				.orElseThrow(() -> new MoneyException(MoneyErrorCode.MisMatchUserId));
+		UsersInRoom usersInRoom = findUserInRoom(userId, roomId);
 
-		long headCount = usersInRoomRepository.countUsersInRoomByRoomId(roomId);
-		if (request.getHeadCount() > headCount - 1) {
-			throw new MoneyException(MoneyErrorCode.OverHeadCount);
-		}
+		validatePossibleHeadCount(usersInRoom.getRoom(), request.getHeadCount());
 
-		MoneyEvent event = MoneyEvent.builder()
-				.user(host)
-				.room(room)
+		SpreadMoney event = SpreadMoney.builder()
+				.user(usersInRoom.getUser())
+				.room(usersInRoom.getRoom())
 				.money(request.getMoney())
+				.headCount(request.getHeadCount())
 				.build();
-		moneyEventRepository.save(event);
-		subMoneyEventRepository.saveAll(event.distributeMoney(request.getHeadCount()));
+
+		spreadMoneyRepository.save(event);
 		return event.getToken();
 	}
 
 	/**
-	 * 조건에 맞는 사용자 조회 및 받기 1건 할당
+	 * 조건에 맞는 사용자 조회 및 검증 후 받기 처리
 	 * (token 일치, 받기 시간 만료 전, 할당 받은 기록이 없고 뿌리기하지 않은 사용자)
 	 * @param userId : 사용자 아이디
 	 * @param roomId : 대화방 아이디
@@ -69,25 +64,21 @@ public class MoneyService {
 	 * @return 받은 금액
 	 */
 	@Transactional
-	public long receive(Long userId, String roomId, String token) {
-		Room room = roomRepository.findByRoomId(roomId)
-				.orElseThrow(() -> new MoneyException(MoneyErrorCode.MisMatchRoomId));
-		User user = usersInRoomRepository.findByUser_UserIdAndRoom_RoomId(userId, roomId)
-				.orElseThrow(() -> new MoneyException(MoneyErrorCode.MisMatchUserId))
-				.getUser();
+	public BigDecimal receive(Long userId, String roomId, String token) {
+		User user = findUserInRoom(userId, roomId).getUser();
+		SpreadMoney event = spreadMoneyRepository.findByTokenAndRecvExpDateAfter(token, LocalDateTime.now())
+				.orElseThrow(() -> new MoneyException(MoneyErrorCode.ExpireReceiveDate));
 
-		MoneyEvent event = moneyEventRepository.findByTokenAndRoomIsAndRecvExpDateAfter(token, room, LocalDateTime.now())
-				.orElseThrow(() -> new MoneyException(MoneyErrorCode.ExpireReceiveDateOrNotAuthUser));
+		validateReceivingUser(event, user);
 
-		long userCount = subMoneyEventRepository.countSubMoneyEventByUser_UserIdOrEvent_User_UserId(userId, userId);
-		if (userCount > 0) {
-			throw new MoneyException(MoneyErrorCode.AlreadyReceivedUser);
-		}
+		ReceivedMoney receivedMoney = ReceivedMoney.builder()
+				.event(event)
+				.user(user)
+				.money(distributeMoney(event.getRemainedHeadCount(), event.getRemainedMoney()))
+				.build();
 
-		SubMoneyEvent subEvent = subMoneyEventRepository.findFirstByAssignedYnAndEvent_Token('N', token)
-				.orElseThrow(() -> new MoneyException(MoneyErrorCode.AlreadyAllReceived));
-		subEvent.update(user);
-		return subEvent.getMoney();
+		receivedMoneyRepository.save(receivedMoney);
+		return receivedMoney.getMoney();
 	}
 
 	/**
@@ -98,22 +89,63 @@ public class MoneyService {
 	 * @param token : 뿌리기 건 토큰값
 	 * @return 조회한 뿌리기 건 정보
 	 */
-	@Transactional
+	@Transactional(readOnly = true)
 	public MoneySpreadViewResponse viewInfo(Long userId, String roomId, String token) {
-		Room room = roomRepository.findByRoomId(roomId)
-				.orElseThrow(() -> new MoneyException(MoneyErrorCode.MisMatchRoomId));
-		MoneyEvent event = moneyEventRepository.findByTokenAndUser_UserIdAndViewExpDateAfter(token, userId, LocalDateTime.now())
-				.orElseThrow(() -> new MoneyException(MoneyErrorCode.ExpireViewDateOrNotAuthUser));
+		User user = findUserInRoom(userId, roomId).getUser();
+		SpreadMoney event = spreadMoneyRepository.findByTokenAndViewExpDateAfter(token, LocalDateTime.now())
+				.orElseThrow(() -> new MoneyException(MoneyErrorCode.ExpireViewDate));
 
-		List<SubMoneyEvent> subEvents = subMoneyEventRepository.findAllByAssignedYnAndEvent_Token('Y', token);
-		long receivedMoney = subEvents.stream()
-				.mapToLong(SubMoneyEvent::getMoney)
-				.sum();
-
-		if (receivedMoney == event.getMoney()) {
-			event.updateAllRecvY();
-		}
-
-		return new MoneySpreadViewResponse(event, receivedMoney);
+		validateViewingUser(event, user);
+		return new MoneySpreadViewResponse(event);
 	}
+
+	private void validatePossibleHeadCount(Room room, long requestHeadCount) {
+		long headCountInRoom = room.getUsers().size();
+		if (requestHeadCount > headCountInRoom - 1) {
+			throw new MoneyException(MoneyErrorCode.OverHeadCount);
+		}
+	}
+
+	private void validateReceivingUser(SpreadMoney event, User user) {
+		if (event.isSpreadUser(user)) {
+			throw new MoneyException(MoneyErrorCode.SpreadUser);
+		}
+		if (event.isReceivedUser(user)) {
+			throw new MoneyException(MoneyErrorCode.AlreadyReceivedUser);
+		}
+		if (event.isAllReceived()) {
+			throw new MoneyException(MoneyErrorCode.AlreadyReceivedUser);
+		}
+	}
+
+	private void validateViewingUser(SpreadMoney event, User user) {
+		if (event.isNotSpreadUser(user)) {
+			throw new MoneyException(MoneyErrorCode.NotSpreadUser);
+		}
+	}
+
+	@Transactional(readOnly = true)
+	protected Room findRoom(String roomId) {
+		return roomRepository.findByRoomId(roomId)
+				.orElseThrow(() -> new MoneyException(MoneyErrorCode.MisMatchRoomId));
+	}
+
+	@Transactional(readOnly = true)
+	protected User findUser(Long userId) {
+		return userRepository.findById(userId)
+				.orElseThrow(() -> new MoneyException(MoneyErrorCode.MisMatchUserId));
+	}
+
+	@Transactional(readOnly = true)
+	protected UsersInRoom findUserInRoom(Long userId, String roomId) {
+		return usersInRoomRepository.findByUserAndRoom(findUser(userId), findRoom(roomId))
+				.orElseThrow(() -> new MoneyException(MoneyErrorCode.MisMatchUserInRoom));
+	}
+
+	private BigDecimal distributeMoney(Long headCount, BigDecimal money) {
+		Distributing method = new Distributing();
+		method.setStrategy(new SameStrategy());
+		return method.distribute(headCount, money);
+	}
+
 }

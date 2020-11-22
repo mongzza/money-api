@@ -1,31 +1,31 @@
 package kakaopay.pretask.moneyapi.api.dto;
 
-import kakaopay.pretask.moneyapi.domain.event.MoneyEvent;
-import kakaopay.pretask.moneyapi.domain.event.SubMoneyEvent;
+import kakaopay.pretask.moneyapi.domain.event.ReceivedMoney;
+import kakaopay.pretask.moneyapi.domain.event.SpreadMoney;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
 public class MoneySpreadViewResponse {
 	private LocalDateTime createdDate;
-	private Long money;
-	private Long receivedMoney;
+	private BigDecimal money;
+	private BigDecimal receivedMoney;
 	private List<ReceivedInfoResponse> receivedInfo;
 
-	public MoneySpreadViewResponse(MoneyEvent event, Long receivedMoney) {
+	public MoneySpreadViewResponse(SpreadMoney event) {
 		this.createdDate = event.getCreatedDate();
 		this.money = event.getMoney();
-		this.receivedMoney = receivedMoney;
+		this.receivedMoney = event.receivedMoniesSum();
 		this.receivedInfo = new ArrayList<>();
-		event.getSubEvents().stream()
-				.filter(subEvent -> subEvent.getAssignedYn() == 'Y')
-				.forEach(subEvent -> this.receivedInfo.add(new ReceivedInfoResponse(subEvent)));
+
+		event.getReceivedMonies()
+				.forEach(received -> this.receivedInfo.add(new ReceivedInfoResponse(received)));
 	}
 
 }
@@ -34,10 +34,10 @@ public class MoneySpreadViewResponse {
 @Setter
 class ReceivedInfoResponse {
 	private Long userId;
-	private Long money;
+	private BigDecimal money;
 
-	public ReceivedInfoResponse(SubMoneyEvent subEvent) {
-		this.userId = subEvent.getUser().getUserId();
-		this.money = subEvent.getMoney();
+	public ReceivedInfoResponse(ReceivedMoney received) {
+		this.userId = received.getUser().getUserId();
+		this.money = received.getMoney();
 	}
 }

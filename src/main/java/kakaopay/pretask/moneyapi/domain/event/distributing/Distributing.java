@@ -2,6 +2,8 @@ package kakaopay.pretask.moneyapi.domain.event.distributing;
 
 import kakaopay.pretask.moneyapi.domain.event.distributing.strategy.DistributeStrategy;
 
+import java.math.BigDecimal;
+
 public class Distributing {
 	private DistributeStrategy strategy;
 
@@ -9,8 +11,8 @@ public class Distributing {
 		this.strategy = strategy;
 	}
 
-	public long[] distribute(int headCount, long money) {
-		return this.strategy.distribute(headCount, money);
+	public BigDecimal distribute(Long remainedHeadCount, BigDecimal remainedMoney) {
+		return this.strategy.distribute(remainedHeadCount, remainedMoney);
 	}
 
 }

@@ -1,7 +1,7 @@
 package kakaopay.pretask.moneyapi.domain.user;
 
 import kakaopay.pretask.moneyapi.domain.UsersInRoom;
-import kakaopay.pretask.moneyapi.domain.event.MoneyEvent;
+import kakaopay.pretask.moneyapi.domain.event.SpreadMoney;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,5 +25,20 @@ public class User implements Serializable {
 	private List<UsersInRoom> rooms = new ArrayList<>();
 
 	@OneToMany(mappedBy = "user")
-	private List<MoneyEvent> events = new ArrayList<>();
+	private List<SpreadMoney> events = new ArrayList<>();
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		User user = (User) o;
+
+		return userId.equals(user.userId);
+	}
+
+	@Override
+	public int hashCode() {
+		return userId.hashCode();
+	}
 }

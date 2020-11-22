@@ -6,7 +6,7 @@ X-ROOM-ID: ROOM1
 
 {
   "money": 50000,
-  "headCount": 1
+  "headCount": 2
 }
 
 ### 뿌리기 API 실패 케이스 - 유저 정보
@@ -33,13 +33,13 @@ X-ROOM-ID: ROOM13
 
 
 ### 받기 API 성공 케이스 - 사용자1
-PUT http://localhost:8080/money/spread/aaa
+PUT http://localhost:8080/money/spread/pDD
 Content-Type: application/json
 X-USER-ID: 10003
 X-ROOM-ID: ROOM1
 
 ### 받기 API 성공 케이스 - 사용자2
-PUT http://localhost:8080/money/spread/aaa
+PUT http://localhost:8080/money/spread/pDD
 Content-Type: application/json
 X-USER-ID: 10004
 X-ROOM-ID: ROOM1
@@ -51,7 +51,7 @@ X-USER-ID: 10003
 X-ROOM-ID: ROOM1
 
 ### 받기 API 실패 케이스 - 뿌린 사용자가 요청
-PUT http://localhost:8080/money/spread/aaa
+PUT http://localhost:8080/money/spread/pDD
 Content-Type: application/json
 X-USER-ID: 10001
 X-ROOM-ID: ROOM1
@@ -69,7 +69,7 @@ X-USER-ID: 10003
 X-ROOM-ID: ROOM1
 
 ### 조회 API 성공 케이스
-GET http://localhost:8080/money/spread/aaa
+GET http://localhost:8080/money/spread/pDD
 Content-Type: application/json
 X-USER-ID: 10001
 X-ROOM-ID: ROOM1

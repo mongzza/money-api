@@ -1,5 +1,7 @@
 package kakaopay.pretask.moneyapi.domain.event.distributing.strategy;
 
+import java.math.BigDecimal;
+
 public interface DistributeStrategy {
-	long[] distribute(int headCount, long money);
+	BigDecimal distribute(Long remainedHeadCount, BigDecimal remainedMoney);
 }

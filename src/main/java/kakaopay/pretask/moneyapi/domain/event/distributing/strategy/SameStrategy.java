@@ -2,7 +2,7 @@ package kakaopay.pretask.moneyapi.domain.event.distributing.strategy;
 
 import java.math.BigDecimal;
 
-public class RandomStrategy implements DistributeStrategy{
+public class SameStrategy implements DistributeStrategy{
 
 	@Override
 	public BigDecimal distribute(Long remainedHeadCount, BigDecimal remainedMoney) {
