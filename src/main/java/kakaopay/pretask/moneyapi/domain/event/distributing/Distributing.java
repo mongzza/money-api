@@ -7,8 +7,12 @@ import java.math.BigDecimal;
 public class Distributing {
 	private final DistributeStrategy strategy;
 
-	public Distributing(DistributeStrategy strategy) {
+	private Distributing(DistributeStrategy strategy) {
 		this.strategy = strategy;
+	}
+
+	public static Distributing of(DistributeStrategy strategy) {
+		return new Distributing(strategy);
 	}
 
 	public BigDecimal distribute(Long remainedHeadCount, BigDecimal remainedMoney) {
