@@ -7,14 +7,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @NoArgsConstructor
 @Entity
-public class Room {
+public class Room implements Serializable {
+
+	private static final long serialVersionUID = -4026831997462043596L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

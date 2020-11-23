@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ public class MoneyServiceTest {
 	private static final Long SPREAD_USER = 10001L;
 	private static final String SPREAD_ROOM = "ROOM1";
 
-	private final MoneySpreadRequest request = new MoneySpreadRequest();
+	private MoneySpreadRequest request;
 
 	@Autowired
 	private MoneyService moneyService;
@@ -34,10 +35,13 @@ public class MoneyServiceTest {
 
 	@Before
 	public void setUp() {
-		request.setMoney(new BigDecimal(50000));
-		request.setHeadCount(4L);
+		request = MoneySpreadRequest.builder()
+				.money(new BigDecimal(50000))
+				.headCount(4L)
+				.build();
 	}
 
+	@Transactional
 	@DisplayName(value = "뿌리기 API 성공 - 적절한 뿌리기 금액, 인원 입력")
 	@Test
 	public void testSpreadSuccess() {
@@ -48,6 +52,7 @@ public class MoneyServiceTest {
 				.isTrue();
 	}
 
+	@Transactional
 	@DisplayName(value = "뿌리기 API 실패 - 대화방 초과 인원 입력")
 	@Test
 	public void testSpreadOverHeadCount() {
@@ -62,6 +67,7 @@ public class MoneyServiceTest {
 		assertThat(before).isEqualTo(after);
 	}
 
+	@Transactional
 	@DisplayName(value = "뿌리기 API 실패 - 대화방에 포함되어있지 않은 사용자 정보 입력")
 	@Test
 	public void testSpreadNotExistUserInRoom() {
@@ -76,6 +82,7 @@ public class MoneyServiceTest {
 		assertThat(before).isEqualTo(after);
 	}
 
+	@Transactional
 	@DisplayName(value = "받기 API 성공 - 뿌리기한 대화방에 포함된 사용자가 받기 요청")
 	@Test
 	public void testReceiveSuccess() {
@@ -86,6 +93,7 @@ public class MoneyServiceTest {
 		assertThat(receivedMoney).isPositive();
 	}
 
+	@Transactional
 	@DisplayName(value = "받기 API 실패 - 뿌리기한 사용자가 받기 요청")
 	@Test
 	public void testReceiveSpreadUserFail() {
@@ -138,6 +146,7 @@ public class MoneyServiceTest {
 				.hasFieldOrPropertyWithValue("userId", 10005L);
 	}
 
+	@Transactional
 	@DisplayName(value = "조회 API 실패 - 뿌리기 하지 않은 사용자가 조회 요청")
 	@Test
 	public void testViewNoAuthUserFail() {

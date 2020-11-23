@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/money", produces = "application/json")
+@RequestMapping(value = "/money")
 public class MoneyController {
 
 	private static final String USER_ID_HEADER = "X-USER-ID";

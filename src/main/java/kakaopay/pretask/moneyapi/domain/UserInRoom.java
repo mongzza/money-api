@@ -6,11 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Getter
 @NoArgsConstructor
 @Entity
-public class UserInRoom {
+public class UserInRoom implements Serializable {
+
+	private static final long serialVersionUID = 3851822177486747133L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

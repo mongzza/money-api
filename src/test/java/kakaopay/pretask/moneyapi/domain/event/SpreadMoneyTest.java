@@ -28,8 +28,15 @@ public class SpreadMoneyTest {
 	private static final Long RECEIVED_USER = 10003L;
 	private static final String SPREAD_ROOM = "ROOM1";
 
-	private final MoneySpreadRequest request = new MoneySpreadRequest();
+	private static final MoneySpreadRequest request;
 	private static SpreadMoney spreadMoney;
+
+	static {
+		request = MoneySpreadRequest.builder()
+				.money(new BigDecimal(50000))
+				.headCount(4L)
+				.build();
+	}
 
 	@Autowired
 	private MoneyService moneyService;
@@ -42,9 +49,6 @@ public class SpreadMoneyTest {
 
 	@Before
 	public void setUp() {
-		request.setMoney(new BigDecimal(50000));
-		request.setHeadCount(4L);
-
 		String token = moneyService.spread(SPREAD_USER, SPREAD_ROOM, request);
 		spreadMoney = spreadMoneyRepository.findByTokenAndRecvExpDateAfter(token, LocalDateTime.now())
 				.orElseThrow(() -> new MoneyException(MoneyErrorCode.ExpireReceiveDate));

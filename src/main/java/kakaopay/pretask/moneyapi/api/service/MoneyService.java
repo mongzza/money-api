@@ -147,7 +147,7 @@ public class MoneyService {
 	 * @return 생성 토큰
 	 */
 	@Retryable(maxAttempts = 2, value = {DataIntegrityViolationException.class, ConstraintViolationException.class})
-	private String saveNewSpreadMoney(UserInRoom userInRoom, MoneySpreadRequest request) {
+	public String saveNewSpreadMoney(UserInRoom userInRoom, MoneySpreadRequest request) {
 		SpreadMoney event = SpreadMoney.builder()
 				.token(TokenUtils.create(TOKEN_SIZE))
 				.user(userInRoom.getUser())
@@ -165,7 +165,7 @@ public class MoneyService {
 	 * @param roomId : 방 아이디
 	 * @return 방 정보
 	 */
-	private Room findRoom(String roomId) {
+	public Room findRoom(String roomId) {
 		return roomRepository.findByRoomId(roomId)
 				.orElseThrow(() -> new MoneyException(MoneyErrorCode.NotExistRoom));
 	}
@@ -175,7 +175,7 @@ public class MoneyService {
 	 * @param userId : 사용자 아이디
 	 * @return 사용자 정보
 	 */
-	private User findUser(Long userId) {
+	public User findUser(Long userId) {
 		return userRepository.findById(userId)
 				.orElseThrow(() -> new MoneyException(MoneyErrorCode.NotExistUser));
 	}
@@ -186,7 +186,8 @@ public class MoneyService {
 	 * @param roomId : 방 아이디
 	 * @return 사용자 정보 + 속해있는 방 정보
 	 */
-	private UserInRoom findUserInRoom(Long userId, String roomId) {
+	@Transactional(readOnly = true)
+	public UserInRoom findUserInRoom(Long userId, String roomId) {
 		return userInRoomRepository.findByUserAndRoom(findUser(userId), findRoom(roomId))
 				.orElseThrow(() -> new MoneyException(MoneyErrorCode.NotExistUserInRoom));
 	}

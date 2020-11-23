@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,7 +18,9 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @Entity
-public class SpreadMoney {
+public class SpreadMoney implements Serializable {
+
+	private static final long serialVersionUID = -6189494992540637546L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

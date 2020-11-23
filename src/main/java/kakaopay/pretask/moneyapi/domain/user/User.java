@@ -7,15 +7,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
 @NoArgsConstructor
 @Entity
-public class User {
+public class User implements Serializable {
+
+	private static final long serialVersionUID = -5993159936088287390L;
 
 	@Id
 	@Column(name = "USER_ID")
