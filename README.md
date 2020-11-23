@@ -18,8 +18,7 @@
 - money-api에서 발생할 수 있는 에러 처리를 위해 커스텀 Exception 추가하고 Enum으로 에러코드 관리
 
 ### 뿌리기 API
-- 사용자와 대화방의 검증을 위해 단순 조회 후 검증 통과 시, 뿌리기 이벤트 생성
-  - 조회, 삽입 트랜잭션 분리
+- 사용자와 대화방의 DB 조회와 데이터 검증 후, 토큰과 뿌리기 이벤트 생성
 - 토큰은 1-9, a-z, A-Z의 순서와 값을 랜덤으로 뽑아 생성
   - 추후 토큰 발급 방법 변경 시 용이하도록 Strategy 패턴 적용
 - SPREAD_MONEY 테이블에 유일한 토큰값 저장
@@ -27,7 +26,6 @@
   - Spring retry 의존성 추가하여 @Retryable 사용(중복 시 1회 재시도)
 
 ### 받기 API
-- 요청한 사용자와 토큰 값이 RECEIVED_MONEY 테이블에 유일해야 하기 때문에 (조회 + 삽입) 과정 한 트랜잭션에서 진행
 - (총 뿌리기 금액 - 현재까지 받은 금액)과 (총 인원 - 현재까지 받은 인원)으로 금액 분배
   - 추후 분배 방법 변경 시 용이하도록 Strategy 패턴 적용
   - 동등 분배, 랜덤 분배 전략 보유
@@ -37,11 +35,6 @@
 
 ### 조회 API
 - 오직 조회만 하는 API이기 때문에 트랜잭션 readOnly 설정
-
-## 프로젝트 구조
-```
-
-```
 
 ## REST API
 ### 뿌리기 API
@@ -230,7 +223,7 @@
 ## DB 설계
 ### ERD
 
-<img src="./src/main/resources/static/images/erd.png" alt="erd" style="width: 400px;"/>
+<img src="./src/main/resources/static/images/erd.png" alt="erd" style="width: 300px;"/>
 
 ### SCHEMA
 ```mysql
