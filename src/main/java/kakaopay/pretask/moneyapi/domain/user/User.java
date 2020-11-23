@@ -2,30 +2,35 @@ package kakaopay.pretask.moneyapi.domain.user;
 
 import kakaopay.pretask.moneyapi.domain.UserInRoom;
 import kakaopay.pretask.moneyapi.domain.event.SpreadMoney;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor
 @Entity
-public class User implements Serializable {
-
-	private static final long serialVersionUID = -4316778035761407241L;
+public class User {
 
 	@Id
-	@Column(name = "USER_ID", length = 64)
+	@Column(name = "USER_ID")
 	private Long userId;
 
-	@OneToMany(mappedBy = "user")
-	private List<UserInRoom> rooms = new ArrayList<>();
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private Set<UserInRoom> rooms = new HashSet<>();
 
-	@OneToMany(mappedBy = "user")
-	private List<SpreadMoney> events = new ArrayList<>();
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private Set<SpreadMoney> events = new HashSet<>();
+
+	@Builder
+	public User(Long userId) {
+		this.userId = userId;
+	}
 
 	@Override
 	public boolean equals(Object o) {

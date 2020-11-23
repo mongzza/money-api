@@ -2,24 +2,22 @@ package kakaopay.pretask.moneyapi.domain.event;
 
 import kakaopay.pretask.moneyapi.domain.room.Room;
 import kakaopay.pretask.moneyapi.domain.user.User;
-import kakaopay.pretask.moneyapi.utils.token.TokenUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor
 @Entity
-public class SpreadMoney implements Serializable {
-
-	private static final long serialVersionUID = -2782108821547888399L;
+public class SpreadMoney {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,8 +49,8 @@ public class SpreadMoney implements Serializable {
 	@Column(nullable = false)
 	private LocalDateTime viewExpDate;
 
-	@OneToMany(mappedBy = "event")
-	private List<ReceivedMoney> receivedMonies = new ArrayList<>();
+	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+	private Set<ReceivedMoney> receivedMonies = new LinkedHashSet<>();
 
 	@Builder
 	public SpreadMoney(String token, User user, Room room, BigDecimal money, Long headCount) {

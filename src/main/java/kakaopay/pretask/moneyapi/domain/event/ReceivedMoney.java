@@ -6,15 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Getter
 @NoArgsConstructor
 @Entity
-public class ReceivedMoney implements Serializable {
-
-	private static final long serialVersionUID = -3987264976435657246L;
+public class ReceivedMoney {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -7,16 +7,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor
 @Entity
-public class Room implements Serializable {
-
-	private static final long serialVersionUID = -1086290499515965067L;
+public class Room {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,11 +23,11 @@ public class Room implements Serializable {
 	@Column(name = "ROOM_ID", length = 64, nullable = false, unique = true)
 	private String roomId;
 
-	@OneToMany(mappedBy = "room")
-	private List<UserInRoom> users = new ArrayList<>();
+	@OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+	private Set<UserInRoom> users = new HashSet<>();
 
-	@OneToMany(mappedBy = "room")
-	private List<SpreadMoney> events = new ArrayList<>();
+	@OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+	private Set<SpreadMoney> events = new HashSet<>();
 
 	@Builder
 	public Room(String roomId) {
