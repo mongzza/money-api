@@ -1,13 +1,12 @@
 package kakaopay.pretask.moneyapi.utils.token.creating.strategy;
 
 public class RandomStrategy implements CreateStrategy {
-	private static final int TOKEN_LENGTH = 3;
 	private static final int METHOD_COUNT = 3;
 
 	@Override
-	public String create() {
+	public String create(int size) {
 		StringBuilder token = new StringBuilder();
-		for (int i = 0; i < TOKEN_LENGTH; i++) {
+		for (int i = 0; i < size; i++) {
 			switch ((int)(Math.random() * METHOD_COUNT)) {
 				case 0: token.append(randomUpperCase());
 				break;
