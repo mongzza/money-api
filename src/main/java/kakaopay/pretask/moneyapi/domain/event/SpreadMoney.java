@@ -30,11 +30,11 @@ public class SpreadMoney implements Serializable {
 	private String token;
 
 	@ManyToOne
-	@JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID", nullable = false)
+	@JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
 	private User user;
 
 	@ManyToOne
-	@JoinColumn(name = "ROOM_ID", referencedColumnName = "ROOM_ID", nullable = false)
+	@JoinColumn(name = "ROOM_ID", referencedColumnName = "ROOM_ID")
 	private Room room;
 
 	@Column(nullable = false)
