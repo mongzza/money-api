@@ -1,0 +1,19 @@
+### 조회 API 성공 케이스
+GET http://localhost:8080/money/spread/D4R
+X-USER-ID: 10001
+X-ROOM-ID: ROOM1
+
+### 조회 API 실패 케이스 - 뿌리기 하지 않은 사용자가 요청
+GET http://localhost:8080/money/spread/aaa
+X-USER-ID: 10003
+X-ROOM-ID: ROOM1
+
+### 조회 API 실패 케이스 - 대화방에 없는 사용자가 요청
+GET http://localhost:8080/money/spread/aaa
+X-USER-ID: 10008
+X-ROOM-ID: ROOM1
+
+### 조회 API 실패 케이스 - 발급되지 않은 토큰 요청
+GET http://localhost:8080/money/spread/www
+X-USER-ID: 10001
+X-ROOM-ID: ROOM1
