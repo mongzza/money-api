@@ -1,11 +1,11 @@
 ### 받기 API 성공 케이스 - 사용자1
-PUT http://localhost:8080/money/spread/FIG
+PUT http://localhost:8080/money/spread/XCY
 X-USER-ID: 10003
 X-ROOM-ID: ROOM1
 
 ### 받기 API 성공 케이스 - 사용자2
-PUT http://localhost:8080/money/spread/D4R
-X-USER-ID: 10004
+PUT http://localhost:8080/money/spread/J1i
+X-USER-ID: 10005
 X-ROOM-ID: ROOM1
 
 ### 받기 API 실패 케이스 - 이미 받은 사용자가 다시 요청

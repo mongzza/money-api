@@ -5,11 +5,22 @@ X-USER-ID: 10001
 X-ROOM-ID: ROOM1
 
 {
-  "money": 50000,
-  "headCount": 2
+  "money": 5000,
+  "headCount": 3
 }
 
-### 뿌리기 API 실패 케이스 - 유저 정보
+### 뿌리기 API 실패 케이스 - 초과 인원수 입력
+POST http://localhost:8080/money/spread
+Content-Type: application/json
+X-USER-ID: 10001
+X-ROOM-ID: ROOM1
+
+{
+  "money": 50000,
+  "headCount": 6
+}
+
+### 뿌리기 API 실패 케이스 - 존재하지 않는 유저 정보
 POST http://localhost:8080/money/spread
 Content-Type: application/json
 X-USER-ID: 11111
@@ -20,7 +31,7 @@ X-ROOM-ID: ROOM1
   "headCount": 6
 }
 
-### 뿌리기 API 실패 케이스 - 방 정보
+### 뿌리기 API 실패 케이스 - 존재하지 않는 방 정보
 POST http://localhost:8080/money/spread
 Content-Type: application/json
 X-USER-ID: 10001

@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Service
 public class MoneyService {
+	private static final int TOKEN_SIZE = 3;
 
 	private final UserRepository userRepository;
 	private final RoomRepository roomRepository;
@@ -47,7 +48,7 @@ public class MoneyService {
 	@Transactional
 	public String spread(Long userId, String roomId, MoneySpreadRequest request) {
 		UserInRoom userInRoom = findUserInRoom(userId, roomId);
-		validatePossibleHeadCount(userInRoom.getRoom(), request.getHeadCount());
+		validatePossibleHeadCount(userInRoom.getRoom(), request);
 		return saveNewSpreadMoney(userInRoom, request);
 	}
 
@@ -96,14 +97,18 @@ public class MoneyService {
 	}
 
 	/**
-	 * 해당 방에서 받기 가능한 최대 인원 수 검증
+	 * 해당 방에서 받기 가능한 최대 인원 수, 최소 금액 검증
 	 * @param room : 방 정보
-	 * @param requestHeadCount : 요청한 인원 수
+	 * @param request : 요청 정보
 	 */
-	private void validatePossibleHeadCount(Room room, long requestHeadCount) {
+	private void validatePossibleHeadCount(Room room, MoneySpreadRequest request) {
 		long headCountInRoom = room.getUsers().size();
-		if (requestHeadCount > headCountInRoom - 1) {
+		if (request.getHeadCount() > headCountInRoom - 1) {
 			throw new MoneyException(MoneyErrorCode.OverHeadCount);
+		}
+
+		if (request.getMoney().compareTo(BigDecimal.valueOf(1000L)) < 0) {
+			throw new MoneyException(MoneyErrorCode.MinimumMoney);
 		}
 	}
 
@@ -120,7 +125,7 @@ public class MoneyService {
 			throw new MoneyException(MoneyErrorCode.AlreadyReceivedUser);
 		}
 		if (event.isAllReceived()) {
-			throw new MoneyException(MoneyErrorCode.AlreadyReceivedUser);
+			throw new MoneyException(MoneyErrorCode.AlreadyAllReceived);
 		}
 	}
 
@@ -142,9 +147,9 @@ public class MoneyService {
 	 * @return 생성 토큰
 	 */
 	@Retryable(maxAttempts = 2, value = {DataIntegrityViolationException.class, ConstraintViolationException.class})
-	public String saveNewSpreadMoney(UserInRoom userInRoom, MoneySpreadRequest request) {
+	private String saveNewSpreadMoney(UserInRoom userInRoom, MoneySpreadRequest request) {
 		SpreadMoney event = SpreadMoney.builder()
-				.token(TokenUtils.create())
+				.token(TokenUtils.create(TOKEN_SIZE))
 				.user(userInRoom.getUser())
 				.room(userInRoom.getRoom())
 				.money(request.getMoney())
@@ -193,7 +198,7 @@ public class MoneyService {
 	 * @return 분배한 머니
 	 */
 	private BigDecimal distributeMoney(Long headCount, BigDecimal money) {
-		return new Distributing(new SameStrategy())
+		return Distributing.of(new SameStrategy())
 				.distribute(headCount, money);
 	}
 }

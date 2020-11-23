@@ -1,5 +1,5 @@
 ### 조회 API 성공 케이스
-GET http://localhost:8080/money/spread/D4R
+GET http://localhost:8080/money/spread/XCY
 X-USER-ID: 10001
 X-ROOM-ID: ROOM1
 
